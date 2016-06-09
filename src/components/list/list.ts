@@ -9,8 +9,7 @@ import {
     Renderer,
     AfterContentInit,
 } from '@angular/core';
-
-
+import { MdLine, MdLineSetter } from '@angular2-material/core/line/line';
 
 @Component({
   moduleId: module.id,
@@ -22,10 +21,6 @@ import {
 })
 export class MdList {}
 
-/* Need directive for a ContentChildren query in list-item */
-@Directive({ selector: '[md-line]' })
-export class MdLine {}
-
 /* Need directive for a ContentChild query in list-item */
 @Directive({ selector: '[md-list-avatar]' })
 export class MdListAvatar {}
@@ -33,44 +28,43 @@ export class MdListAvatar {}
 @Component({
   moduleId: module.id,
   selector: 'md-list-item, a[md-list-item]',
-  host: {'role': 'listitem'},
+  host: {
+    'role': 'listitem',
+    '(focus)': 'handleFocus()',
+    '(blur)': 'handleBlur()',
+  },
   templateUrl: 'list-item.html',
   encapsulation: ViewEncapsulation.None
 })
 export class MdListItem implements AfterContentInit {
-  @ContentChildren(MdLine) _lines: QueryList<MdLine>;
-
   /** @internal */
-  ngAfterContentInit() {
-    this._setLineClass(this._lines.length);
+  hasFocus: boolean = false;
 
-    this._lines.changes.subscribe(() => {
-      this._setLineClass(this._lines.length);
-    });
-  }
+  _lineSetter: MdLineSetter;
+
+  @ContentChildren(MdLine) _lines: QueryList<MdLine>;
 
   @ContentChild(MdListAvatar)
   private set _hasAvatar(avatar: MdListAvatar) {
-    this._setClass('md-list-avatar', avatar != null);
+    this._renderer.setElementClass(this._element.nativeElement, 'md-list-avatar', avatar != null);
   }
 
   constructor(private _renderer: Renderer, private _element: ElementRef) {}
 
-  private _setLineClass(count: number): void {
-    this._resetClasses();
-    if (count === 2 || count === 3) {
-      this._setClass(`md-${count}-line`, true);
-    }
+  /** TODO: internal */
+  ngAfterContentInit() {
+    this._lineSetter = new MdLineSetter(this._lines, this._renderer, this._element);
   }
 
-  private _resetClasses(): void {
-    this._setClass('md-2-line', false);
-    this._setClass('md-3-line', false);
+  /** @internal */
+  handleFocus() {
+    this.hasFocus = true;
   }
 
-  private _setClass(className: string, bool: boolean): void {
-    this._renderer.setElementClass(this._element.nativeElement, className, bool);
+  /** @internal */
+  handleBlur() {
+    this.hasFocus = false;
   }
 }
 
-export const MD_LIST_DIRECTIVES: any[] = [MdList, MdListItem, MdLine, MdListAvatar];
+export const MD_LIST_DIRECTIVES = [MdList, MdListItem, MdLine, MdListAvatar];

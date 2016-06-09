@@ -18,16 +18,17 @@ const components = [
   'radio',
   'sidenav',
   'slide-toggle',
-  'tab-group',
+  'button-toggle',
+  'tabs',
   'toolbar'
 ];
 
 
 /** Map relative paths to URLs. */
 const map: any = {
-  '@angular2-material/core': '/core',
+  '@angular2-material/core': 'core',
 };
-components.forEach(name => map[`@angular2-material/${name}`] = `/components/${name}`);
+components.forEach(name => map[`@angular2-material/${name}`] = `components/${name}`);
 
 
 /** User packages configuration. */

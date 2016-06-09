@@ -7,9 +7,10 @@ import {
   ContentChildren,
   QueryList,
   Renderer,
-  ElementRef
+  ElementRef,
+  Optional
 } from '@angular/core';
-import {MdGridTile} from './grid-tile';
+import {MdGridTile, MdGridTileText} from './grid-tile';
 import {TileCoordinator} from './tile-coordinator';
 import {
     TileStyler,
@@ -19,6 +20,8 @@ import {
 } from './tile-styler';
 import {MdGridListColsError} from './grid-list-errors';
 import {Dir} from '@angular2-material/core/rtl/dir';
+import {MdLine} from '@angular2-material/core/line/line';
+import {coerceToString, coerceToNumber} from './grid-list-measure';
 
 // TODO(kara): Conditional (responsive) column count / row size.
 // TODO(kara): Re-layout on window resize / media change (debounced).
@@ -57,7 +60,7 @@ export class MdGridList implements OnInit, AfterContentChecked {
   constructor(
       private _renderer: Renderer,
       private _element: ElementRef,
-      private _dir: Dir) {}
+      @Optional() private _dir: Dir) {}
 
   @Input()
   get cols() {
@@ -84,7 +87,7 @@ export class MdGridList implements OnInit, AfterContentChecked {
     this._setTileStyler();
   }
 
-  /** @internal */
+  /** TODO: internal */
   ngOnInit() {
     this._checkCols();
     this._checkRowHeight();
@@ -93,7 +96,7 @@ export class MdGridList implements OnInit, AfterContentChecked {
   /**
    * The layout calculation is fairly cheap if nothing changes, so there's little cost
    * to run it frequently.
-   * @internal
+   * TODO: internal
    */
   ngAfterContentChecked() {
     this._layoutTiles();
@@ -128,7 +131,8 @@ export class MdGridList implements OnInit, AfterContentChecked {
   private _layoutTiles(): void {
     let tiles = this._tiles.toArray();
     let tracker = new TileCoordinator(this.cols, tiles);
-    this._tileStyler.init(this.gutterSize, tracker, this.cols, this._dir);
+    let direction = this._dir ? this._dir.value : 'ltr';
+    this._tileStyler.init(this.gutterSize, tracker, this.cols, direction);
 
     for (let i = 0; i < tiles.length; i++) {
       let pos = tracker.positions[i];
@@ -149,20 +153,5 @@ export class MdGridList implements OnInit, AfterContentChecked {
   }
 }
 
-/**
- * Converts values into strings. Falsy values become empty strings.
- * @internal
- */
-export function coerceToString(value: string | number): string {
-  return `${value || ''}`;
-}
 
-/**
- * Converts a value that might be a string into a number.
- * @internal
- */
-export function coerceToNumber(value: string | number): number {
-  return typeof value === 'string' ? parseInt(value, 10) : value;
-}
-
-export const MD_GRID_LIST_DIRECTIVES: any[] = [MdGridList, MdGridTile];
+export const MD_GRID_LIST_DIRECTIVES: any[] = [MdGridList, MdGridTile, MdLine, MdGridTileText];

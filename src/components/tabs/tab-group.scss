@@ -4,7 +4,8 @@
 $md-tab-bar-height: 48px !default;
 
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
   font-family: $md-font-family;
 }
 
@@ -15,6 +16,7 @@ $md-tab-bar-height: 48px !default;
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid md-color($md-background, status-bar);
+  flex-shrink: 0;
 }
 
 /** Wraps each tab label */
@@ -41,14 +43,18 @@ $md-tab-bar-height: 48px !default;
 /** The bottom section of the view; contains the tab bodies */
 .md-tab-body-wrapper {
   position: relative;
-  height: 200px;
   overflow: hidden;
-  padding: 12px;
+  flex-grow: 1;
+  display: flex;
 }
 
 /** Wraps each tab body */
 .md-tab-body {
   display: none;
+  overflow: auto;
+  box-sizing: border-box;
+  flex-grow: 1;
+  flex-shrink: 1;
   &.md-active {
     display: block;
   }
@@ -60,5 +66,5 @@ md-ink-bar {
   bottom: 0;
   height: 2px;
   background-color: md-color($md-primary, 500);
-  transition: 0.35s ease-out;
+  transition: 350ms ease-out;
 }
